@@ -1,0 +1,21 @@
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+
+TICK_RATE = 60
+
+DISPLAY_CAPTION = "Labirint"
+
+# ENTITY
+PLAYER_BASE_SPEED = 3
+PLAYER_BASE_POWER = 3
+PLAYER_WALK_ANIMATION = [f"sprites/player/walk/Player ({x}).png" for x in range(1, 9)]  # 8 кадров
+PLAYER_IDLE_ANIMATION = [f"sprites/player/idle/Player ({x}).png" for x in range(1, 5)]  # 4 кадра
+
+WEAK_ENEMY_BASE_SPEED = 1
+WEAK_ENEMY_BASE_POWER = 1
+
+NORMAL_ENEMY_BASE_SPEED = 2
+NORMAL_ENEMY_BASE_POWER = 2
+
+STRONG_ENEMY_BASE_SPEED = 3
+STRONG_ENEMY_BASE_POWER = 3
