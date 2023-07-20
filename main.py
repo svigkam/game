@@ -16,7 +16,14 @@ def init_game():
     clock = pygame.time.Clock()
 
     player = Player(400, 300, 52, 80)
-    enemies = [Enemy(100, 200, 52, 80, player)]
+    enemies = [Enemy(100, 200, 52, 80, player), Enemy(500, 500, 52, 80, player)]
+
+
+def ui_render():
+    # f1 = pygame.font.Font(None, 30)
+    # text1 = f1.render(f"Health: {player.hp}", 1, (180, 0, 0))
+    # display.blit(text1, (100, 50))
+    pass
 
 
 def game():
@@ -26,13 +33,20 @@ def game():
         if event.type == pygame.QUIT:
             sys.exit()
             pygame.quit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            btn = pygame.mouse.get_pressed()
+            player.attack(enemies, pos, btn)
 
+    ui_render()
     key_listener(pygame.key.get_pressed(), player)
 
+    # ENTITY
     player.update(display)
-
     for enemy in enemies:
         enemy.update(display)
+        if enemy.is_dead:
+            enemies.remove(enemy)
 
     clock.tick(TICK_RATE)  # fps
     pygame.display.update()
