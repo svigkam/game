@@ -1,5 +1,10 @@
 SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
+SCREEN_HEIGHT = 768
+
+TILE_SIZE = 64
+
+XTILES = 20
+YTILES = 12
 
 DEBUG = True
 
@@ -15,8 +20,8 @@ BLADE_VENOM_BAFF = 2
 # ENTITY
 PLAYER_BASE_HP = 6
 PLAYER_BASE_SPEED = 3
-PLAYER_WALK_ANIMATION = [f"sprites/player/walk/Player ({x}).png" for x in range(1, 9)]  # 8 кадров
-PLAYER_IDLE_ANIMATION = [f"sprites/player/idle/Player ({x}).png" for x in range(1, 5)]  # 4 кадра
+PLAYER_WALK_ANIMATION = [f"assets/sprites/player/walk/Player ({x}).png" for x in range(1, 9)]  # 8 кадров
+PLAYER_IDLE_ANIMATION = [f"assets/sprites/player/idle/Player ({x}).png" for x in range(1, 5)]  # 4 кадра
 
 WEAK_ENEMY_BASE_HP = 1
 WEAK_ENEMY_BASE_SPEED = 1

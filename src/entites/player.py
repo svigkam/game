@@ -1,10 +1,9 @@
 import time
 
-import pygame.draw
+from src.objects.blade import Blade
 
-from blade import Blade
-from entity import Entity
-from config import *
+from src.config import *
+from src.entites.entity import Entity
 
 
 class Player(Entity):

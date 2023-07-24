@@ -1,7 +1,5 @@
-import pygame.draw
-
-from entity import Entity
-from config import *
+from src.config import *
+from src.entites.entity import Entity
 
 
 class Enemy(Entity):

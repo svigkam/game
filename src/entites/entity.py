@@ -1,5 +1,5 @@
 import pygame
-from config import DEBUG
+from src.config import DEBUG
 
 
 class Entity:
