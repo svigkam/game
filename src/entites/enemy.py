@@ -3,10 +3,10 @@ from src.entites.entity import Entity
 
 
 class Enemy(Entity):
-    def __init__(self, x, y, width, height, player):
-        super().__init__(x, y, width, height, NORMAL_ENEMY_BASE_SPEED,
+    def __init__(self, x, y, player):
+        super().__init__(x, y, NORMAL_ENEMY_BASE_SPEED,
                          NORMAL_ENEMY_BASE_POWER, WEAK_ENEMY_BASE_HP,
-                         PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION)
+                         PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION, 1.5)
         self.player = player
 
     def attack(self):
@@ -25,13 +25,13 @@ class Enemy(Entity):
         move_x = 0
         move_y = 0
 
-        if self.player.x < self.x:
+        if self.player.rect.centerx < self.rect.centerx:
             move_x = -1
-        elif self.player.x > self.x:
+        elif self.player.rect.centerx > self.rect.centerx:
             move_x = 1
-        if self.player.y > self.y:
+        if self.player.rect.centery > self.rect.centery:
             move_y = 1
-        elif self.player.y < self.y:
+        elif self.player.rect.centery < self.rect.centery:
             move_y = -1
         if move_x != 0 or move_y != 0:
             super().move(move_x, move_y)

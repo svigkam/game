@@ -3,19 +3,17 @@ import sys
 from src.config import *
 from src.entites.player import Player
 from src.key_listener import key_listener
-from src.level.level import Level
-from src.level.level_config import room_base_layout
-from src.level.room import Room
 from src.utils import initLevels
 
 pygame.init()
 display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(DISPLAY_CAPTION)
 clock = pygame.time.Clock()
-player = Player(400, 300, 52, 80)
+player = Player(600, 300)
 
 level = initLevels(display, player)
-player.collideObjects = level.current_room.objects
+
+new_room_info = "Null"
 
 
 def game():
@@ -29,11 +27,12 @@ def game():
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
             btn = pygame.mouse.get_pressed()
-            # player.attack(enemies, pos, btn)
+            player.attack(level.current_room.enemies)
 
-
-    key_listener(pygame.key.get_pressed(), player)
+    keys = pygame.key.get_pressed()
+    key_listener(keys, player, level)
     player.update(display)
+
     clock.tick(TICK_RATE)  # fps
     pygame.display.update()
 

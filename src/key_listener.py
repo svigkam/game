@@ -18,5 +18,10 @@ def movement(keys, player):
         player.move(move_x, move_y)
 
 
-def key_listener(keys, player):
+def key_listener(keys, player, level):
     movement(keys, player)
+
+    if keys[pygame.K_e]:
+        level.changeRoom(player)
+
+

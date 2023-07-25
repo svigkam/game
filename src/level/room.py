@@ -1,14 +1,19 @@
 import random
 
+import pygame
+
 from src.config import TILE_SIZE
 from src.entites.enemy import Enemy
 from src.level.level_config import FloorsTypes
+from src.objects.door import Door
 from src.objects.floor import Floor
 from src.objects.wall import Wall
 
 def loadImage(floorType, num):
     path = f"assets/sprites/room/{floorType}/"
     match num:
+        case -1:  # Портал
+            path += "door.png"
         case 0:  # Пол
             path += f"floor{random.randint(0, 4)}.png"
         case 1:  # стена сверху
@@ -34,8 +39,10 @@ class Room:
     def __init__(self, display, layout, player):
         self.layout = layout
         self.objects = []
-        self.enemies = [Enemy(100, 200, 52, 80, player), Enemy(500, 500, 52, 80, player)]
+        self.enemies = [Enemy(100, 200, player), Enemy(500, 500, player)]
         self.display = display
+        self.room_type = FloorsTypes.BASEMENT
+        self.player = player
 
         self.fillRoom()
 
@@ -43,9 +50,9 @@ class Room:
         for y, row in enumerate(self.layout):
             for x, tile in enumerate(row):
                 if [1, 2, 3, 4, 5, 6, 7, 8].__contains__(tile):
-                    self.objects.append(Wall(x*TILE_SIZE, y*TILE_SIZE, loadImage(FloorsTypes.BASEMENT.value, tile)))
+                    self.objects.append(Wall(x*TILE_SIZE, y*TILE_SIZE, loadImage(self.room_type.value, tile)))
                 elif tile == 0:
-                    self.objects.append(Floor(x*TILE_SIZE, y*TILE_SIZE, loadImage(FloorsTypes.BASEMENT.value, tile)))
+                    self.objects.append(Floor(x*TILE_SIZE, y*TILE_SIZE, loadImage(self.room_type.value, tile)))
 
         for enemy in self.enemies:
             enemy.collideObjects = self.objects
@@ -58,7 +65,6 @@ class Room:
             if enemy.is_dead:
                 self.enemies.remove(enemy)
 
-    def addDoors(self):
-        pass
+
 
 

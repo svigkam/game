@@ -36,7 +36,7 @@ class RoomsTypes(Enum):
 
 
 class DoorsCoords(Enum):
-    UP = (10, 0)
-    DOWN = (10, 12)
-    RIGHT = (20, 6)
-    LEFT = (0, 6)
+    UP = [9, 0, 0]
+    DOWN = [9, 11, 180]
+    RIGHT = [19, 5, 270]
+    LEFT = [0, 5, 90]

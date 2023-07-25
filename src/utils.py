@@ -10,3 +10,4 @@ def initLevels(disp, player):
         [Room(disp, room_base_layout, player), 0, 0],
     ], [0, 0])
     return level1
+

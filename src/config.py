@@ -20,8 +20,11 @@ BLADE_VENOM_BAFF = 2
 # ENTITY
 PLAYER_BASE_HP = 6
 PLAYER_BASE_SPEED = 3
-PLAYER_WALK_ANIMATION = [f"assets/sprites/player/walk/Player ({x}).png" for x in range(1, 9)]  # 8 кадров
-PLAYER_IDLE_ANIMATION = [f"assets/sprites/player/idle/Player ({x}).png" for x in range(1, 5)]  # 4 кадра
+PLAYER_SCALE = 2
+PLAYER_ATTACK_DISTANCE = 60
+PLAYER_WALK_ANIMATION = [f"assets/sprites/player/walk/q ({x}).png" for x in range(1, 9)]  # 8 кадров
+PLAYER_IDLE_ANIMATION = [f"assets/sprites/player/idle/q ({x}).png" for x in range(1, 6)]  # 4 кадра
+PLAYER_ATTACK_ANIMATION = [f"assets/sprites/player/attack/q ({x}).png" for x in range(1, 11)]  # 11 кадра
 
 WEAK_ENEMY_BASE_HP = 1
 WEAK_ENEMY_BASE_SPEED = 1
