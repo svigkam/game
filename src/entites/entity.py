@@ -1,5 +1,6 @@
 import pygame
 from src.config import DEBUG
+from src.objects.floor import Floor
 
 
 class Entity:
@@ -19,6 +20,8 @@ class Entity:
         self.is_dead = False
         self.walk_animation = [pygame.image.load(x) for x in walk_animation]
         self.idle_animation = [pygame.image.load(x) for x in idle_animation]
+
+        self.collideObjects = None
 
         # Характеристики
         self.speed = speed
@@ -75,6 +78,7 @@ class Entity:
         self.moving_down = False
 
     def move(self, is_x, is_y):  # is_x (+ вправо, - влево) is_y (+ вниз, - вверх)
+
         if is_x == 1:
             self.moving_right = True
         elif is_x == -1:
@@ -83,8 +87,29 @@ class Entity:
             self.moving_down = True
         elif is_y == -1:
             self.moving_up = True
+
         self.x += self.speed * is_x
         self.y += self.speed * is_y
+
+        block_hit_list = self.rect.collideobjectsall([x for x in self.collideObjects if not isinstance(x, Floor)])
+
+        # for block in block_hit_list:
+        #     if is_x > 0 or is_x < 0:
+        #         self.x += self.speed * is_x * -1
+        #
+        #     if is_y > 0 or is_y < 0:
+        #         self.y += self.speed * is_y * -1
+
+        for block in block_hit_list:
+            if is_x > 0:
+                self.rect.x = block.rect.x - self.rect.w
+            elif is_x < 0:
+                self.rect.x = block.rect.x + self.rect.w
+
+            if is_y > 0:
+                self.rect.y = block.rect.y - self.rect.h
+            elif is_y < 0:
+                self.rect.x = block.rect.y + self.rect.h
 
     def attack(self, num=0):
         if num == 1:
