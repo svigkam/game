@@ -1,3 +1,5 @@
+import time
+
 from src.config import *
 from src.entites.entity import Entity
 
@@ -9,9 +11,10 @@ class Enemy(Entity):
                          PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION, 1.5)
         self.player = player
 
-    def attack(self):
-        super().attack()
-        self.player.get_damage(self.power)
+    def attack(self, **kwargs):
+        if time.time() - self.prev_time > self.timer:
+            self.prev_time = time.time()
+            super().attack(self.player)
 
     def update(self, display):
         super().update(display)

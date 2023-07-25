@@ -1,3 +1,4 @@
+import time
 from enum import Enum
 
 import pygame
@@ -12,13 +13,13 @@ class AnimationState(Enum):
     MOVING = "moving"
 
 
-
 class Entity:
     def __init__(self, x, y, speed, power, hp, walk_animation, idle_animation, scale_factor):
         # Анимация и состояния
         self.walk_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in walk_animation]
         self.idle_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in idle_animation]
-        self.attack_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in PLAYER_ATTACK_ANIMATION]
+        self.attack_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in
+                            PLAYER_ATTACK_ANIMATION]
         self.cur_anim = self.idle_anim
         self.anim_state = AnimationState.IDLE
         self.anim_index = 0
@@ -39,15 +40,20 @@ class Entity:
         # Характеристики
         self.speed = speed
         self.power = power
+        self.max_hp = hp
         self.hp = hp
+        self.ratio = 1
+
+        self.timer = 1
+        self.prev_time = time.time()
 
     def get_damage(self, damage):
-        self.is_freeze = True
         self.hp -= damage
         if self.hp <= 0:
             self.death()
         else:
-            self.changeAnimation(AnimationState.INJURY, True)
+            self.ratio -= 0.00001
+            # self.changeAnimation(AnimationState.INJURY, True)
 
     def animate(self, display):
         # Счётчик анимации
@@ -65,6 +71,7 @@ class Entity:
             cur_frame = pygame.transform.flip(cur_frame, True, False)
         if self.anim_index + 1 == len(self.cur_anim) and self.is_freeze:
             self.is_freeze = False
+            self.changeAnimation(AnimationState.IDLE)
 
         display.blit(cur_frame, self.rect)  # Отрисовка
 
@@ -72,9 +79,11 @@ class Entity:
         if DEBUG:  # Debug
             self.debug(display)
 
+        if self.ratio != 1 and DEBUG:
+            self.showHealth(display)
         self.animate(display)  # Анимация
 
-        if not self.is_freeze:  # Если не заморожен, то вкл idle анимация
+        if not self.is_freeze:
             self.changeAnimation(AnimationState.IDLE)
 
     def move(self, is_x, is_y):  # is_x (+ вправо, - влево) is_y (+ вниз, - вверх)
@@ -94,15 +103,10 @@ class Entity:
             elif is_x == -1:
                 self.changeAnimation(AnimationState.MOVING)
                 self.is_watching_left = True
-            if is_y == 1:
-                pass
-                # self.changeAnimation(AnimationState.MOVING_DOWN)
-            elif is_y == -1:
-                pass
-                # self.changeAnimation(AnimationState.MOVING_UP)
 
             self.rect.centerx += self.speed * is_x
-            block_hit_list = pygame.sprite.spritecollide(self, [x for x in self.collideObjects if x.isObstacle == True], 0)
+            block_hit_list = pygame.sprite.spritecollide(self, [x for x in self.collideObjects if x.isObstacle == True],
+                                                         0)
             for block in block_hit_list:
                 if is_x > 0:
                     self.rect.right = block.rect.left
@@ -110,20 +114,26 @@ class Entity:
                     self.rect.left = block.rect.right
 
             self.rect.centery += self.speed * is_y
-            block_hit_list = pygame.sprite.spritecollide(self, [x for x in self.collideObjects if x.isObstacle == True], 0)
+            block_hit_list = pygame.sprite.spritecollide(self, [x for x in self.collideObjects if x.isObstacle == True],
+                                                         0)
             for block in block_hit_list:
                 if is_y > 0:
                     self.rect.bottom = block.rect.top
                 else:
                     self.rect.top = block.rect.bottom
 
-
-
-    def attack(self):
+    def attack(self, target):
+        if target:
+            target.get_damage(self.power)
         self.changeAnimation(AnimationState.ATTACK, True)
 
-    def changeAnimation(self, state, is_freeze=None):
-        if is_freeze is not None:
+    def showHealth(self, display):
+        self.ratio = self.hp / self.max_hp
+        pygame.draw.rect(display, "red", (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w, 3))
+        pygame.draw.rect(display, "green", (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w * self.ratio, 3))
+
+    def changeAnimation(self, state, is_freeze=False):
+        if is_freeze:
             self.is_freeze = is_freeze
         self.anim_state = state
 
@@ -142,13 +152,16 @@ class Entity:
                 if self.cur_anim != self.attack_anim:
                     self.cur_anim = self.attack_anim
                     anim_is_change = True
+            # case AnimationState.DEATH:
+            #     if self.cur_anim != self.attack_anim:
+            #         self.cur_anim = self.attack_anim
+            #         anim_is_change = True
 
         if anim_is_change and self.is_freeze:
             self.anim_index, self.anim_count = 0, 0
 
     def death(self):
-        self.changeAnimation(AnimationState.DEATH, True)
-        # TODO: вызов анимации с задержкой
+        # self.changeAnimation(AnimationState.DEATH, True)
         self.is_dead = True
 
     def debug(self, display):

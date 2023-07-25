@@ -1,6 +1,6 @@
 import pygame.transform
 
-from src.config import TILE_SIZE
+from src.config import TILE_SIZE, DEBUG
 from src.objects.roomObject import RoomObject
 
 
@@ -14,5 +14,4 @@ class Door(RoomObject):
 
     def update(self, display):
         super().update(display)
-        print(self.rect.centerx, self.rect.centery)
-        pygame.draw.rect(display, (0, 0, 255), self.rect, 1, 1)
+        if DEBUG: pygame.draw.rect(display, (0, 0, 255), self.rect, 1, 1)
