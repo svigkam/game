@@ -6,7 +6,7 @@ TILE_SIZE = 64
 XTILES = 20
 YTILES = 12
 
-DEBUG = True
+DEBUG = False
 
 TICK_RATE = 60
 

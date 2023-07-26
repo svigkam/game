@@ -12,8 +12,6 @@ from src.objects.wall import Wall
 def loadImage(floorType, num):
     path = f"assets/sprites/room/{floorType}/"
     match num:
-        case -1:  # Портал
-            path += "door.png"
         case 0:  # Пол
             path += f"floor{random.randint(0, 4)}.png"
         case 1:  # стена сверху
