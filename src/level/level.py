@@ -1,21 +1,25 @@
 import time
 
+import pygame.image
+
 from src.config import TILE_SIZE
-from src.level.level_config import FloorsTypes, DoorsCoords
+from src.level.level_config import FloorsTypes, DoorsCoords, RoomObjects
 from src.level.room import Room, loadImage
 from src.objects.door import Door
+from src.objects.roomObject import RoomObject
 
 
 class Level:
-    def __init__(self, rooms: [Room], current_room: []):
+    def __init__(self, rooms: [Room], current_room: [], level_type):
         self.rooms = rooms
         self.current_room_coords = current_room
-        self.current_room = rooms[current_room[0]][current_room[1]]
-        self.level_type = FloorsTypes.BASEMENT
+        self.current_room: Room = rooms[current_room[0]][current_room[1]]
+        self.level_type = level_type
 
         self.checkDoors()
+        self.current_room.update_info_about_room()
 
-        self.current_room.player.collideObjects = self.current_room.objects
+        # self.current_room.player.collideObjects = self.current_room.objects
 
     def checkDoors(self):
         for x in range(len(self.rooms)):
@@ -24,22 +28,23 @@ class Level:
                     if x - 1 > -1 and isinstance(self.rooms[x - 1][y], Room):
                         self.rooms[x][y].objects.append(
                             Door(DoorsCoords.LEFT.value[0] * TILE_SIZE, DoorsCoords.LEFT.value[1] * TILE_SIZE,
-                                 loadImage(self.level_type.value, -1), DoorsCoords.LEFT.value[2],
-                                 DoorsCoords.LEFT.name))
+                                 RoomObjects.DOOR.value, DoorsCoords.LEFT.value[2],
+                                 DoorsCoords.LEFT.name, self.rooms[x - 1][y].is_last_room))
                     if x + 1 < len(self.rooms) and isinstance(self.rooms[x + 1][y], Room):
                         self.rooms[x][y].objects.append(
                             Door(DoorsCoords.RIGHT.value[0] * TILE_SIZE, DoorsCoords.RIGHT.value[1] * TILE_SIZE,
-                                 loadImage(self.level_type.value, -1), DoorsCoords.RIGHT.value[2],
-                                 DoorsCoords.RIGHT.name))
+                                 RoomObjects.DOOR.value, DoorsCoords.RIGHT.value[2],
+                                 DoorsCoords.RIGHT.name, self.rooms[x + 1][y].is_last_room))
                     if y - 1 > -1 and isinstance(self.rooms[x][y - 1], Room):
                         self.rooms[x][y].objects.append(
                             Door(DoorsCoords.UP.value[0] * TILE_SIZE, DoorsCoords.UP.value[1] * TILE_SIZE,
-                                 loadImage(self.level_type.value, -1), DoorsCoords.UP.value[2], DoorsCoords.UP.name))
+                                 RoomObjects.DOOR.value, DoorsCoords.UP.value[2], DoorsCoords.UP.name,
+                                 self.rooms[x][y - 1].is_last_room))
                     if y + 1 < len(self.rooms[x]) and isinstance(self.rooms[x][y + 1], Room):
                         self.rooms[x][y].objects.append(
                             Door(DoorsCoords.DOWN.value[0] * TILE_SIZE, DoorsCoords.DOWN.value[1] * TILE_SIZE,
-                                 loadImage(self.level_type.value, -1), DoorsCoords.DOWN.value[2],
-                                 DoorsCoords.DOWN.name))
+                                 RoomObjects.DOOR.value, DoorsCoords.DOWN.value[2],
+                                 DoorsCoords.DOWN.name, self.rooms[x][y + 1].is_last_room))
 
     def draw(self):
         self.current_room.draw()
@@ -47,7 +52,7 @@ class Level:
     def changeRoom(self, player):
         direction = player.checkDoors()
 
-        if direction:
+        if direction and not self.current_room.enemies:
             dx, dy = 0, 0
             px, py = player.rect.x, player.rect.y
             match direction:

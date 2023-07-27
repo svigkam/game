@@ -14,7 +14,7 @@ class AnimationState(Enum):
 
 
 class Entity:
-    def __init__(self, x, y, speed, power, hp, walk_animation, idle_animation, scale_factor):
+    def __init__(self, x, y, speed, hp, walk_animation, idle_animation, scale_factor):
         # Анимация и состояния
         self.walk_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in walk_animation]
         self.idle_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in idle_animation]
@@ -39,7 +39,7 @@ class Entity:
 
         # Характеристики
         self.speed = speed
-        self.power = power
+        self.power = 1
         self.max_hp = hp
         self.hp = hp
         self.ratio = 1
@@ -69,9 +69,8 @@ class Entity:
         cur_frame = self.cur_anim[self.anim_index]
         if self.is_watching_left:
             cur_frame = pygame.transform.flip(cur_frame, True, False)
-        if self.anim_index + 1 == len(self.cur_anim) and self.is_freeze:
-            self.is_freeze = False
-            self.changeAnimation(AnimationState.IDLE)
+        if self.anim_index + 1 == len(self.cur_anim):
+            self.changeAnimation(AnimationState.IDLE, force=True)
 
         display.blit(cur_frame, self.rect)  # Отрисовка
 
@@ -87,15 +86,6 @@ class Entity:
             self.changeAnimation(AnimationState.IDLE)
 
     def move(self, is_x, is_y):  # is_x (+ вправо, - влево) is_y (+ вниз, - вверх)
-        '''
-        Движение опеределяется от знака входящих is_x и is_y
-        Перемещение происходит прибавляя скорость помноженную на знак движения по координате
-
-        block_hit_list содержит объекты, с которыми self.rect пересекается, затем идет итерация по массиву для отката
-
-        :param is_x: Движение +вправо -влево
-        :param is_y: Движение +вниз -вверх
-        '''
         if not self.is_freeze:
             if is_x == 1:
                 self.changeAnimation(AnimationState.MOVING)
@@ -105,6 +95,7 @@ class Entity:
                 self.is_watching_left = True
 
             self.rect.centerx += self.speed * is_x
+
             block_hit_list = pygame.sprite.spritecollide(self, [x for x in self.collideObjects if x.isObstacle == True],
                                                          0)
             for block in block_hit_list:
@@ -125,37 +116,44 @@ class Entity:
     def attack(self, target):
         if target:
             target.get_damage(self.power)
-        self.changeAnimation(AnimationState.ATTACK, True)
+        self.changeAnimation(AnimationState.ATTACK, False)
 
     def showHealth(self, display):
         self.ratio = self.hp / self.max_hp
         pygame.draw.rect(display, "red", (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w, 3))
         pygame.draw.rect(display, "green", (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w * self.ratio, 3))
 
-    def changeAnimation(self, state, is_freeze=False):
-        if is_freeze:
-            self.is_freeze = is_freeze
-        self.anim_state = state
-
+    def changeAnimation(self, state, is_freeze=False, force=False):
+        self.is_freeze = is_freeze
         anim_is_change = False
 
-        match self.anim_state:
-            case AnimationState.IDLE:
+        if force:
+            self.anim_state = state
+            self.cur_anim = self.idle_anim
+            anim_is_change = True
+
+        if state == AnimationState.DEATH:
+            # death
+            anim_is_change = True
+        elif state == AnimationState.INJURY and self.anim_state != AnimationState.DEATH:
+            # injury
+            anim_is_change = True
+        elif state == AnimationState.ATTACK and self.anim_state != AnimationState.DEATH and self.anim_state != AnimationState.INJURY:
+            if self.cur_anim != self.attack_anim:
+                self.anim_state = state
+                self.cur_anim = self.attack_anim
+                anim_is_change = True
+        elif self.anim_state != AnimationState.DEATH and self.anim_state != AnimationState.INJURY and self.anim_state != AnimationState.ATTACK:
+            if state == AnimationState.IDLE:
                 if self.cur_anim != self.idle_anim:
+                    self.anim_state = state
                     self.cur_anim = self.idle_anim
                     anim_is_change = True
-            case AnimationState.MOVING:
+            elif state == AnimationState.MOVING:
                 if self.cur_anim != self.walk_anim:
+                    self.anim_state = state
                     self.cur_anim = self.walk_anim
                     anim_is_change = True
-            case AnimationState.ATTACK:
-                if self.cur_anim != self.attack_anim:
-                    self.cur_anim = self.attack_anim
-                    anim_is_change = True
-            # case AnimationState.DEATH:
-            #     if self.cur_anim != self.attack_anim:
-            #         self.cur_anim = self.attack_anim
-            #         anim_is_change = True
 
         if anim_is_change and self.is_freeze:
             self.anim_index, self.anim_count = 0, 0

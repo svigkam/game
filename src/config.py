@@ -1,8 +1,6 @@
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 768
-
 TILE_SIZE = 64
-
 XTILES = 20
 YTILES = 12
 
@@ -12,16 +10,18 @@ TICK_RATE = 60
 
 DISPLAY_CAPTION = "Labirint"
 
-# BLADE
-BLADE_BASE_POWER = 3
-BLADE_POWER_BAFF = 2
-BLADE_VENOM_BAFF = 2
-
 # ENTITY
-PLAYER_BASE_HP = 30
+PLAYER_BASE_HP = 6
+PLAYER_BASE_POWER = 3
 PLAYER_BASE_SPEED = 3
 PLAYER_SCALE = 2
-PLAYER_ATTACK_DISTANCE = 75
+PLAYER_ATTACK_DISTANCE = 85
+
+PLAYER_FULL_HEART_IMAGE = "assets/sprites/ui/full_heart.png"
+PLAYER_HALF_HEART_IMAGE = "assets/sprites/ui/half_heart.png"
+PLAYER_EMPTY_HEART_IMAGE = "assets/sprites/ui/empty_heart.png"
+PLAYER_COINS_IMAGE = "assets/sprites/ui/coins.png"
+
 PLAYER_WALK_ANIMATION = [f"assets/sprites/player/walk/q ({x}).png" for x in range(1, 9)]  # 8 кадров
 PLAYER_IDLE_ANIMATION = [f"assets/sprites/player/idle/q ({x}).png" for x in range(1, 6)]  # 4 кадра
 PLAYER_ATTACK_ANIMATION = [f"assets/sprites/player/attack/q ({x}).png" for x in range(1, 11)]  # 11 кадра

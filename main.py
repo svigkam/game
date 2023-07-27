@@ -4,6 +4,7 @@ from src.config import *
 from src.entites.player import Player
 from src.key_listener import key_listener
 from src.menu import Menu, font_path
+from src.user_interface import UserInterface
 from src.utils import initLevels
 
 pygame.init()
@@ -70,8 +71,6 @@ def game():
     while is_playing:
         is_paused = False
 
-
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -98,7 +97,7 @@ def game():
                 display.blit(game_over_text, game_over_text_rect)
                 display.blit(restart_button, restart_button_rect)
             else:
-                display.fill((0, 0, 0))
+                # display.fill((0, 0, 0))
                 level.draw()
 
                 keys = pygame.key.get_pressed()
@@ -109,11 +108,34 @@ def game():
             pygame.display.update()
 
 
+ui = UserInterface(player)
+
+def game_loop():
+    display.fill((0, 0, 0))
+    level.draw()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+            pygame.quit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            btn = pygame.mouse.get_pressed()
+            player.attack(level.current_room.enemies)
+
+
+    keys = pygame.key.get_pressed()
+    key_listener(keys, player, level)
+    player.update(display)
+    ui.update(display)
+
+    clock.tick(TICK_RATE)  # fps
+    pygame.display.update()
 
 
 def main():
     while True:
-        game()
+        game_loop()
 
 
 if __name__ == '__main__':

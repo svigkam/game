@@ -6,8 +6,7 @@ from src.entites.entity import Entity
 
 class Enemy(Entity):
     def __init__(self, x, y, player):
-        super().__init__(x, y, NORMAL_ENEMY_BASE_SPEED,
-                         NORMAL_ENEMY_BASE_POWER, WEAK_ENEMY_BASE_HP,
+        super().__init__(x, y, NORMAL_ENEMY_BASE_SPEED, WEAK_ENEMY_BASE_HP,
                          PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION, 1.5)
         self.player = player
 

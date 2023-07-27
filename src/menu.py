@@ -21,11 +21,11 @@ class Menu:
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
+            if event.have_key == pygame.K_w:
                 self.move_cursor(-1)
-            elif event.key == pygame.K_s:
+            elif event.have_key == pygame.K_s:
                 self.move_cursor(1)
-            elif event.key == pygame.K_RETURN:
+            elif event.have_key == pygame.K_RETURN:
                 return self.items[self.selected_item_index]
 
     def move_cursor(self, direction):
