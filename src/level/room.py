@@ -64,12 +64,13 @@ class Room:
                         self.objects.append(Portal(x * TILE_SIZE, y * TILE_SIZE))
 
     def draw(self):
-
         for i in self.objects[:]:
             if i.to_clear:
                 self.update_info_about_room(delete=True, i=i)
-            if len(self.enemies) == 0 and i.visible == False:
+            if len(self.enemies) == 0 and isinstance(i, Portal):
                 i.visible = True
+            else:
+                i.visible = False
             i.update(self.display)
 
         for enemy in self.enemies:
@@ -89,5 +90,6 @@ class Room:
                 self.player.collideObjects.remove(i)
         else:  # update
             for enemy in self.enemies:
-                enemy.collideObjects = self.objects
-            self.player.collideObjects = self.objects
+                enemy.collideObjects = self.objects[:]
+            self.player.collideObjects = self.objects[:]
+            self.player.empty_level = True if len(self.enemies) == 0 else False

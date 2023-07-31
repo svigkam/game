@@ -15,11 +15,7 @@ player = Player(600, 300)
 ui = UserInterface(player)
 
 levels, level_index = initLevels(display, player), 0
-
-
-def changeLevel(new_index):
-    pass
-
+levels[level_index].current_room.update_info_about_room()
 
 def show_start_menu(screen):
     start_menu = Menu(["Start", "Exit"])
@@ -66,6 +62,8 @@ def pause_menu():
 
 
 def game():
+    global level_index
+
     game_over_font = pygame.font.Font(font_path, 60)
     button_font = pygame.font.Font(font_path, 30)
     restart_button = button_font.render("*Restart", True, (255, 255, 255))
@@ -97,7 +95,6 @@ def game():
             if player.is_dead:
                 game_over_text = game_over_font.render("Game Over", True, (255, 0, 0))
                 game_over_text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-                # display.fill((0, 0, 0))
                 display.blit(game_over_text, game_over_text_rect)
                 display.blit(restart_button, restart_button_rect)
             else:
@@ -107,9 +104,10 @@ def game():
                 key_listener(keys, player)
 
                 if keys[pygame.K_e]:
-                    levels[level_index].changeRoom(player)
                     if player.checkPortal():
-                        changeLevel(level_index + 1)
+                        level_index += 1
+                        levels[level_index].current_room.update_info_about_room()
+                    levels[level_index].changeRoom(player)
 
                 player.update(display)
                 ui.update(display)

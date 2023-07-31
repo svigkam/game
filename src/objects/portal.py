@@ -10,7 +10,7 @@ class Portal(RoomObject):
         self.anim = [pygame.transform.scale_by(pygame.image.load(x), 0.34) for x in RoomObjects.PORTAL.value]
         self.anim_index = 0
         self.anim_count = 0
-        self.anim_delay = 10
+        self.anim_delay = 7
         self.visible = False
         super().__init__(x, y, TILE_SIZE, TILE_SIZE, self.anim[0], is_obstacle=False)
 

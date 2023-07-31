@@ -19,8 +19,6 @@ class Level:
         self.checkDoors()
         self.current_room.update_info_about_room()
 
-        # self.current_room.player.collideObjects = self.current_room.objects
-
     def checkDoors(self):
         for x in range(len(self.rooms)):
             for y in range(len(self.rooms[x])):

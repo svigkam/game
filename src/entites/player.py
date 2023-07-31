@@ -7,6 +7,7 @@ from src.entites.entity import Entity, AnimationState
 from src.level.level_config import RoomObjects
 from src.objects.coin import Coin
 from src.objects.door import Door
+from src.objects.floor import Floor
 from src.objects.health import Health
 from src.objects.key import Key
 from src.objects.portal import Portal
@@ -17,7 +18,7 @@ class Player(Entity):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_SPEED, PLAYER_HP, PLAYER_POWER, PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION,
                          PLAYER_DEATH_ANIMATION, PLAYER_INJURY_ANIMATION, PLAYER_ATTACK_ANIMATION, PLAYER_SCALE)
-        self.prev_time, self.door_prev_time, self.spike_prev_timer = time.time(), time.time(), time.time()
+        self.prev_time, self.door_prev_time, self.portal_prev_time, self.spike_prev_timer = time.time(), time.time(), time.time(), time.time()
         self.checking_timer = 0.3
         self.have_key = False
         self.attack_radius = pygame.Rect(0, 0, 0, 0)
@@ -32,7 +33,16 @@ class Player(Entity):
         self.update_attack_radius()
         self.checkObjectsInRoom(display)
 
+
+
+
         if DEBUG:
+            for i in self.collideObjects:
+                if not isinstance(i, Floor):
+                    if isinstance(i, Door):
+                        pygame.draw.rect(display, (0, 0, 255), i.rect, 1, 1)
+                    else:
+                        pygame.draw.rect(display, (50, 150, 50), i.rect, 1, 1)
             pygame.draw.rect(display, (255, 0, 0), self.attack_radius, 1, 1)
             pygame.draw.rect(display, (255, 120, 0), self.spike_radius, 1, 1)
 
@@ -47,11 +57,14 @@ class Player(Entity):
     def checkObjectsInRoom(self, display):
         # Проверка на дверь
         doors = [x for x in self.collideObjects if isinstance(x, Door) and self.attack_radius.colliderect(x.rect)]
-        if doors and (not doors[0].closed or self.have_key) and self.empty_level:
-            display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
+        if doors and self.empty_level:
+            for i in doors:
+                if not i.closed or self.have_key:
+                    display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
 
-        # Проверка на дверь
-        portal = [x for x in self.collideObjects if isinstance(x, Portal) and self.attack_radius.colliderect(x.rect)]
+
+        # Проверка на портал
+        portal = [x for x in self.collideObjects if isinstance(x, Portal) and self.attack_radius.colliderect(x.rect) and x.visible]
         if portal and self.empty_level:
             display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
 
@@ -94,12 +107,16 @@ class Player(Entity):
         return False
 
     def checkPortal(self) -> bool:
-        if time.time() - self.door_prev_time > self.checking_timer:
-            self.door_prev_time = time.time()
+        if time.time() - self.portal_prev_time > self.checking_timer:
+            self.portal_prev_time = time.time()
             for portal in [x for x in self.collideObjects if isinstance(x, Portal)]:
                 if self.attack_radius.colliderect(portal.rect) and self.empty_level:
                     return True
         return False
+
+    def set_pos(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
 
     def update_attack_radius(self):
         self.spike_radius = pygame.Rect(self.rect.x - 5, self.rect.y - 5, self.rect.w + 10, self.rect.h + 10)
