@@ -12,10 +12,14 @@ display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption(DISPLAY_CAPTION)
 clock = pygame.time.Clock()
 player = Player(600, 300)
+ui = UserInterface(player)
 
-level = initLevels(display, player)
+levels, level_index = initLevels(display, player), 0
 
-new_room_info = "Null"
+
+def changeLevel(new_index):
+    pass
+
 
 def show_start_menu(screen):
     start_menu = Menu(["Start", "Exit"])
@@ -39,6 +43,7 @@ def show_start_menu(screen):
 
         start_menu.draw(screen, SCREEN_WIDTH - 50, 50, 30)
         pygame.display.flip()
+
 
 def pause_menu():
     pause_menu = Menu(["Continue", "Return to Menu"])
@@ -81,61 +86,41 @@ def game():
                 elif event.key == pygame.K_ESCAPE and not is_paused:
                     is_paused = True
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                btn = pygame.mouse.get_pressed()
-                player.attack(level.current_room.enemies)
+                player.attack(levels[level_index].current_room.enemies)
 
         if is_paused:
             is_paused = pause_menu()
             if is_paused:
                 is_playing = show_start_menu(display)
         else:
+            display.fill((0, 0, 0))
             if player.is_dead:
                 game_over_text = game_over_font.render("Game Over", True, (255, 0, 0))
                 game_over_text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-                display.fill((0, 0, 0))
+                # display.fill((0, 0, 0))
                 display.blit(game_over_text, game_over_text_rect)
                 display.blit(restart_button, restart_button_rect)
             else:
-                # display.fill((0, 0, 0))
-                level.draw()
+                levels[level_index].draw()
 
                 keys = pygame.key.get_pressed()
-                key_listener(keys, player, level)
+                key_listener(keys, player)
+
+                if keys[pygame.K_e]:
+                    levels[level_index].changeRoom(player)
+                    if player.checkPortal():
+                        changeLevel(level_index + 1)
+
                 player.update(display)
+                ui.update(display)
 
-            clock.tick(TICK_RATE)  # fps
+            clock.tick(TICK_RATE)
             pygame.display.update()
-
-
-ui = UserInterface(player)
-
-def game_loop():
-    display.fill((0, 0, 0))
-    level.draw()
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-            pygame.quit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos()
-            btn = pygame.mouse.get_pressed()
-            player.attack(level.current_room.enemies)
-
-
-    keys = pygame.key.get_pressed()
-    key_listener(keys, player, level)
-    player.update(display)
-    ui.update(display)
-
-    clock.tick(TICK_RATE)  # fps
-    pygame.display.update()
 
 
 def main():
     while True:
-        game_loop()
+        game()
 
 
 if __name__ == '__main__':

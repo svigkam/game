@@ -1,27 +1,40 @@
 import time
 
+import pygame
+
 from src.config import *
 from src.entites.entity import Entity
 
 
 class Enemy(Entity):
-    def __init__(self, x, y, player):
-        super().__init__(x, y, NORMAL_ENEMY_BASE_SPEED, WEAK_ENEMY_BASE_HP,
-                         PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION, 1.5)
+    def __init__(self, x, y, speed, hp, power, walk, idle, death, injury, attack, scale, player, radius):
+        super().__init__(x, y, speed, hp, power, walk, idle, death, injury, attack, scale)
         self.player = player
+        self.radius = radius
+        self.attack_radius = pygame.Rect(0, 0, 0, 0)
+
+    def update(self, display):
+        super().update(display)
+        self.update_attack_radius()
+
+        if DEBUG:
+            pygame.draw.rect(display, (255, 51, 51), self.attack_radius, 1, 1)
+
+        if not self.attack_radius.colliderect(self.player.rect):
+            self.move()
+        else:
+            self.attack()
+
+    def update_attack_radius(self):
+        self.attack_radius = pygame.Rect(self.rect.x - self.radius / 2,
+                                         self.rect.y - self.radius / 2,
+                                         self.rect.w + self.radius,
+                                         self.rect.h + self.radius)
 
     def attack(self, **kwargs):
         if time.time() - self.prev_time > self.timer:
             self.prev_time = time.time()
             super().attack(self.player)
-
-    def update(self, display):
-        super().update(display)
-
-        if not self.rect.colliderect(self.player.rect):
-            self.move()
-        else:
-            self.attack()
 
     def move(self, **kwargs):
         move_x = 0

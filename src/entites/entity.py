@@ -2,7 +2,7 @@ import time
 from enum import Enum
 
 import pygame
-from src.config import DEBUG, PLAYER_ATTACK_ANIMATION
+from src.config import DEBUG, PLAYER_ATTACK_ANIMATION, PLAYER_DEATH_ANIMATION, PLAYER_INJURY_ANIMATION
 
 
 class AnimationState(Enum):
@@ -14,12 +14,14 @@ class AnimationState(Enum):
 
 
 class Entity:
-    def __init__(self, x, y, speed, hp, walk_animation, idle_animation, scale_factor):
+    def __init__(self, x, y, speed, hp, power, walk_anim, idle_anim, death_anim, injury_anim, attack_anim, scale_factor):
         # Анимация и состояния
-        self.walk_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in walk_animation]
-        self.idle_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in idle_animation]
-        self.attack_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in
-                            PLAYER_ATTACK_ANIMATION]
+        self.walk_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in walk_anim]
+        self.idle_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in idle_anim]
+        self.death_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in death_anim]
+        self.injury_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in injury_anim]
+        self.attack_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in attack_anim]
+
         self.cur_anim = self.idle_anim
         self.anim_state = AnimationState.IDLE
         self.anim_index = 0
@@ -39,7 +41,7 @@ class Entity:
 
         # Характеристики
         self.speed = speed
-        self.power = 1
+        self.power = power
         self.max_hp = hp
         self.hp = hp
         self.ratio = 1
@@ -53,7 +55,7 @@ class Entity:
             self.death()
         else:
             self.ratio -= 0.00001
-            # self.changeAnimation(AnimationState.INJURY, True)
+            self.changeAnimation(AnimationState.INJURY, True)
 
     def animate(self, display):
         # Счётчик анимации
@@ -70,6 +72,8 @@ class Entity:
         if self.is_watching_left:
             cur_frame = pygame.transform.flip(cur_frame, True, False)
         if self.anim_index + 1 == len(self.cur_anim):
+            if self.anim_state == AnimationState.DEATH:
+                self.is_dead = True
             self.changeAnimation(AnimationState.IDLE, force=True)
 
         display.blit(cur_frame, self.rect)  # Отрисовка
@@ -114,14 +118,16 @@ class Entity:
                     self.rect.top = block.rect.bottom
 
     def attack(self, target):
-        if target:
-            target.get_damage(self.power)
-        self.changeAnimation(AnimationState.ATTACK, False)
+        if self.anim_state != AnimationState.DEATH and self.anim_state != AnimationState.INJURY:
+            if target:
+                target.get_damage(self.power)
+            self.changeAnimation(AnimationState.ATTACK, False)
 
     def showHealth(self, display):
         self.ratio = self.hp / self.max_hp
         pygame.draw.rect(display, "red", (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w, 3))
-        pygame.draw.rect(display, "green", (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w * self.ratio, 3))
+        pygame.draw.rect(display, "green",
+                         (self.rect.topleft[0], self.rect.centery - self.rect.h, self.rect.w * self.ratio, 3))
 
     def changeAnimation(self, state, is_freeze=False, force=False):
         self.is_freeze = is_freeze
@@ -133,11 +139,15 @@ class Entity:
             anim_is_change = True
 
         if state == AnimationState.DEATH:
-            # death
-            anim_is_change = True
+            if self.cur_anim != self.death_anim:
+                self.anim_state = state
+                self.cur_anim = self.death_anim
+                anim_is_change = True
         elif state == AnimationState.INJURY and self.anim_state != AnimationState.DEATH:
-            # injury
-            anim_is_change = True
+            if self.cur_anim != self.injury_anim:
+                self.anim_state = state
+                self.cur_anim = self.injury_anim
+                anim_is_change = True
         elif state == AnimationState.ATTACK and self.anim_state != AnimationState.DEATH and self.anim_state != AnimationState.INJURY:
             if self.cur_anim != self.attack_anim:
                 self.anim_state = state
@@ -159,8 +169,8 @@ class Entity:
             self.anim_index, self.anim_count = 0, 0
 
     def death(self):
-        # self.changeAnimation(AnimationState.DEATH, True)
-        self.is_dead = True
+        self.anim_delay += 5
+        self.changeAnimation(AnimationState.DEATH, True)
 
     def debug(self, display):
         font = pygame.font.Font(None, 24)

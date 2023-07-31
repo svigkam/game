@@ -1,3 +1,5 @@
+import time
+
 import pygame.image
 
 from src.config import TILE_SIZE, DEBUG
@@ -14,3 +16,4 @@ class Spike(RoomObject):
 
         if DEBUG:
             pygame.draw.rect(display, (125, 0, 255), self.rect, 1, 1)
+

@@ -1,7 +1,7 @@
 import pygame
 
 
-def movement(keys, player):
+def key_listener(keys, player):
     move_x, move_y = 0, 0
 
     if keys[pygame.K_a]:
@@ -16,13 +16,3 @@ def movement(keys, player):
 
     if move_x != 0 or move_y != 0:
         player.move(move_x, move_y)
-
-
-def key_listener(keys, player, level):
-    movement(keys, player)
-
-    if keys[pygame.K_e]:
-        level.changeRoom(player)
-
-
-

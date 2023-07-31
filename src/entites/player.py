@@ -9,23 +9,22 @@ from src.objects.coin import Coin
 from src.objects.door import Door
 from src.objects.health import Health
 from src.objects.key import Key
+from src.objects.portal import Portal
 from src.objects.spike import Spike
 
 
 class Player(Entity):
     def __init__(self, x, y):
-        super().__init__(x, y, PLAYER_BASE_SPEED, PLAYER_BASE_HP,
-                         PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION, PLAYER_SCALE)
-        self.prev_time = time.time()
-        self.door_prev_time = time.time()
-        self.spike_prev_timer = time.time()
+        super().__init__(x, y, PLAYER_SPEED, PLAYER_HP, PLAYER_POWER, PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION,
+                         PLAYER_DEATH_ANIMATION, PLAYER_INJURY_ANIMATION, PLAYER_ATTACK_ANIMATION, PLAYER_SCALE)
+        self.prev_time, self.door_prev_time, self.spike_prev_timer = time.time(), time.time(), time.time()
         self.checking_timer = 0.3
         self.have_key = False
         self.attack_radius = pygame.Rect(0, 0, 0, 0)
         self.spike_radius = pygame.Rect(0, 0, 0, 0)
         self.coins = 0
         self.empty_level = False
-        self.power = PLAYER_BASE_POWER
+        self.power = PLAYER_POWER
         self.e_key = pygame.image.load(RoomObjects.E_KEY.value)
 
     def update(self, display):
@@ -46,13 +45,14 @@ class Player(Entity):
                     super().attack(enemy)
 
     def checkObjectsInRoom(self, display):
-        # Проверка каждые self.checking_timer, чтоб не нагружать систему лишний раз
-        # if time.time() - self.prev_time > self.checking_timer:
-        #     self.prev_time = time.time()
-
         # Проверка на дверь
         doors = [x for x in self.collideObjects if isinstance(x, Door) and self.attack_radius.colliderect(x.rect)]
         if doors and (not doors[0].closed or self.have_key) and self.empty_level:
+            display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
+
+        # Проверка на дверь
+        portal = [x for x in self.collideObjects if isinstance(x, Portal) and self.attack_radius.colliderect(x.rect)]
+        if portal and self.empty_level:
             display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
 
         # Проверка на ключ
@@ -70,11 +70,10 @@ class Player(Entity):
                 self.coins += 10
 
         # Проверка на шипы
-        if time.time() - self.spike_prev_timer > 0.4:
+        spikes = [x for x in self.collideObjects if isinstance(x, Spike) and self.spike_radius.colliderect(x.rect)]
+        if spikes and (time.time() - self.spike_prev_timer > 0.7):
             self.spike_prev_timer = time.time()
-            spikes = [x for x in self.collideObjects if isinstance(x, Spike) and self.spike_radius.colliderect(x.rect)]
-            if spikes:
-                self.get_damage(1)
+            self.get_damage(1)
 
         # Проверка на аптечку
         health = [x for x in self.collideObjects if isinstance(x, Health) and self.rect.colliderect(x.rect)]
@@ -92,6 +91,14 @@ class Player(Entity):
                         door.closed = False
                         self.have_key = False
                     return door.direction
+        return False
+
+    def checkPortal(self) -> bool:
+        if time.time() - self.door_prev_time > self.checking_timer:
+            self.door_prev_time = time.time()
+            for portal in [x for x in self.collideObjects if isinstance(x, Portal)]:
+                if self.attack_radius.colliderect(portal.rect) and self.empty_level:
+                    return True
         return False
 
     def update_attack_radius(self):

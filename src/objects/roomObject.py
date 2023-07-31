@@ -16,6 +16,7 @@ class RoomObject:
         self.isObstacle = is_obstacle
 
         self.to_clear = False
+        self.visible = True
 
     def update(self, display):
         display.blit(self.image, self.image.get_rect(center=(self.rect.center)))

@@ -1,19 +1,15 @@
-# 1 - стена верх-низ
-# 2 - стена слева-сверху
-# 3 - угол стены
-import random
 from enum import Enum
 
 
 class RoomObjects(Enum):
     LOCK = "assets/sprites/room/lock.png"
     DOOR = "assets/sprites/room/door.png"
-    KEY = [f"assets/sprites/room/key/key ({x}).png" for x in range(1, 25)]  # 24 кадра
-    COIN = [f"assets/sprites/room/coin/q ({x}).png" for x in range(1, 6)]  # 5 кадра
-    STONE = [f"assets/sprites/room/stones/q ({x}).png" for x in range(1, 7)]  # 5 кадра
-    HEALTH = [f"assets/sprites/room/health/q ({x}).png" for x in range(1, 13)]  # 5 кадра
+    KEY = [f"assets/sprites/room/key/key ({x}).png" for x in range(1, 25)]
+    COIN = [f"assets/sprites/room/coin/q ({x}).png" for x in range(1, 6)]
+    STONE = [f"assets/sprites/room/stones/q ({x}).png" for x in range(1, 7)]
+    HEALTH = [f"assets/sprites/room/health/q ({x}).png" for x in range(1, 13)]
     SPIKE = "assets/sprites/room/spike.png"
-    POTION = ""
+    PORTAL = [f"assets/sprites/room/portal/portal ({x}).png" for x in range(1, 5)]
     E_KEY = "assets/sprites/room/e_key.png"
 
 
@@ -52,17 +48,21 @@ class LevelsRooms(Enum):
 
 class FloorsTypes(Enum):
     NECROPOLIS: str = "necropolis"
-    CAVES: str = "caves"
-    CATACOMBS: str = "catacombs"
     DEPTHS: str = "depths"
+    UTERO: str = "utero"
     WOMB: str = "womb"
 
 
-class RoomsTypes(Enum):
-    EMPTY: str = "empty"
-    DEFAULT: str = "default"
-    SPAWN: str = "spawn"
-    BOSS: str = "boss"
+class HelpPath(Enum):
+    A = "assets/sprites/ui/A-Key.png"
+    W = "assets/sprites/ui/W-Key.png"
+    S = "assets/sprites/ui/S-Key.png"
+    D = "assets/sprites/ui/D-Key.png"
+    E = "assets/sprites/ui/E-Key.png"
+    SPACE = "assets/sprites/ui/Space-Key.png"
+    MOVE = [f"assets/sprites/ui/player/walk ({x}).png" for x in range(1, 9)]
+    ATTACK = [f"assets/sprites/ui/player/attack ({x}).png" for x in range(1, 11)]
+    ACTION = [f"assets/sprites/ui/player/door ({x}).png" for x in range(1, 11)]
 
 
 class DoorsCoords(Enum):
