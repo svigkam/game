@@ -1,5 +1,7 @@
 import pygame
 
+from src.config import SOUND_SELECT
+
 font_path = "assets/better-vcr_0.ttf"
 
 class Menu:
@@ -21,6 +23,7 @@ class Menu:
 
     def handle_event(self, event):
         if event.type == pygame.KEYDOWN:
+            pygame.mixer.Sound(SOUND_SELECT).play()
             if event.key == pygame.K_w:
                 self.move_cursor(-1)
             elif event.key == pygame.K_s:

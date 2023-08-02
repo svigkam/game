@@ -2,7 +2,7 @@ import time
 from enum import Enum
 
 import pygame
-from src.config import DEBUG, PLAYER_ATTACK_ANIMATION, PLAYER_DEATH_ANIMATION, PLAYER_INJURY_ANIMATION
+from src.config import DEBUG
 
 
 class AnimationState(Enum):
@@ -14,13 +14,18 @@ class AnimationState(Enum):
 
 
 class Entity:
-    def __init__(self, x, y, speed, hp, power, walk_anim, idle_anim, death_anim, injury_anim, attack_anim, scale_factor):
+    def __init__(self, x, y, speed, hp, power, walk_anim, idle_anim, death_anim, injury_anim, attack_anim, scale_factor, smove, sdeath, sinjury, sattack):
         # Анимация и состояния
         self.walk_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in walk_anim]
         self.idle_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in idle_anim]
         self.death_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in death_anim]
         self.injury_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in injury_anim]
         self.attack_anim = [pygame.transform.scale_by(pygame.image.load(x), scale_factor) for x in attack_anim]
+
+        self.sound_move = smove
+        self.sound_injury = sinjury
+        self.sound_death = sdeath
+        self.sound_attack = sattack
 
         self.cur_anim = self.idle_anim
         self.anim_state = AnimationState.IDLE
@@ -54,6 +59,7 @@ class Entity:
         if self.hp <= 0:
             self.death()
         else:
+            pygame.mixer.Sound(self.sound_injury).play()
             self.ratio -= 0.00001
             self.changeAnimation(AnimationState.INJURY, True)
 
@@ -91,6 +97,7 @@ class Entity:
 
     def move(self, is_x, is_y):  # is_x (+ вправо, - влево) is_y (+ вниз, - вверх)
         if not self.is_freeze:
+            # pygame.mixer.Sound(self.sound_move).play()
             if is_x == 1:
                 self.changeAnimation(AnimationState.MOVING)
                 self.is_watching_left = False
@@ -119,6 +126,7 @@ class Entity:
 
     def attack(self, target):
         if self.anim_state != AnimationState.DEATH and self.anim_state != AnimationState.INJURY:
+            pygame.mixer.Sound(self.sound_attack).play()
             if target:
                 target.get_damage(self.power)
             self.changeAnimation(AnimationState.ATTACK, False)
@@ -169,6 +177,7 @@ class Entity:
             self.anim_index, self.anim_count = 0, 0
 
     def death(self):
+        pygame.mixer.Sound(self.sound_death).play()
         self.anim_delay += 5
         self.changeAnimation(AnimationState.DEATH, True)
 

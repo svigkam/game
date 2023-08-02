@@ -1,6 +1,6 @@
 import pygame.image
 
-from src.config import TILE_SIZE, DEBUG
+from src.config import TILE_SIZE, DEBUG, SOUND_HEALTH_UP
 from src.level.level_config import RoomObjects
 from src.objects.roomObject import RoomObject
 
@@ -27,3 +27,7 @@ class Health(RoomObject):
 
         if DEBUG:
             pygame.draw.rect(display, (125, 142, 255), self.rect, 1, 1)
+
+    def pick_up(self):
+        pygame.mixer.Sound(SOUND_HEALTH_UP).play()
+        super().pick_up()

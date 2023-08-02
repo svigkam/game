@@ -1,6 +1,7 @@
 import pygame
 
 from src.config import TILE_SIZE
+from src.entites.boss import Boss
 from src.entites.enemy import Enemy
 from src.entites.minotaur import Minotaur
 from src.entites.snake import Snake
@@ -62,6 +63,8 @@ class Room:
                         self.objects.append(Health(x * TILE_SIZE, y * TILE_SIZE))
                     elif tile == 100:
                         self.objects.append(Portal(x * TILE_SIZE, y * TILE_SIZE))
+                    elif tile == 1000:
+                        self.enemies.append(Boss(x * TILE_SIZE, y * TILE_SIZE, self.player))
 
     def draw(self):
         for i in self.objects[:]:

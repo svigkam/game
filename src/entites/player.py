@@ -3,7 +3,7 @@ import time
 import pygame
 
 from src.config import *
-from src.entites.entity import Entity, AnimationState
+from src.entites.entity import Entity
 from src.level.level_config import RoomObjects
 from src.objects.coin import Coin
 from src.objects.door import Door
@@ -11,13 +11,15 @@ from src.objects.floor import Floor
 from src.objects.health import Health
 from src.objects.key import Key
 from src.objects.portal import Portal
+from src.objects.shop import Shop
 from src.objects.spike import Spike
 
 
 class Player(Entity):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_SPEED, PLAYER_HP, PLAYER_POWER, PLAYER_WALK_ANIMATION, PLAYER_IDLE_ANIMATION,
-                         PLAYER_DEATH_ANIMATION, PLAYER_INJURY_ANIMATION, PLAYER_ATTACK_ANIMATION, PLAYER_SCALE)
+                         PLAYER_DEATH_ANIMATION, PLAYER_INJURY_ANIMATION, PLAYER_ATTACK_ANIMATION, PLAYER_SCALE,
+                         SOUND_PLAYER_WALK, SOUND_PLAYER_DEATH, SOUND_PLAYER_DAMAGE, SOUND_PLAYER_ATTACK)
         self.prev_time, self.door_prev_time, self.portal_prev_time, self.spike_prev_timer = time.time(), time.time(), time.time(), time.time()
         self.checking_timer = 0.3
         self.have_key = False
@@ -32,9 +34,6 @@ class Player(Entity):
         super().update(display)
         self.update_attack_radius()
         self.checkObjectsInRoom(display)
-
-
-
 
         if DEBUG:
             for i in self.collideObjects:
@@ -62,9 +61,9 @@ class Player(Entity):
                 if not i.closed or self.have_key:
                     display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
 
-
         # Проверка на портал
-        portal = [x for x in self.collideObjects if isinstance(x, Portal) and self.attack_radius.colliderect(x.rect) and x.visible]
+        portal = [x for x in self.collideObjects if
+                  isinstance(x, Portal) and self.attack_radius.colliderect(x.rect) and x.visible]
         if portal and self.empty_level:
             display.blit(self.e_key, self.e_key.get_rect(center=self.rect.center, y=self.rect.y - 45))
 
@@ -80,7 +79,7 @@ class Player(Entity):
         if coins:
             for coin in coins:
                 coin.pick_up()
-                self.coins += 10
+                self.coins += 3
 
         # Проверка на шипы
         spikes = [x for x in self.collideObjects if isinstance(x, Spike) and self.spike_radius.colliderect(x.rect)]
@@ -93,7 +92,10 @@ class Player(Entity):
         if health:
             for item in health:
                 item.pick_up()
-                self.hp += 2
+                if self.hp + 2 >= 6:
+                    self.hp = 6
+                else:
+                    self.hp += 2
 
     def checkDoors(self):
         if time.time() - self.door_prev_time > self.checking_timer:
@@ -113,6 +115,11 @@ class Player(Entity):
                 if self.attack_radius.colliderect(portal.rect) and self.empty_level:
                     return True
         return False
+
+    def buyAtShop(self, num):
+        shop = [x for x in self.collideObjects if isinstance(x, Shop) and self.attack_radius.colliderect(x.rect)]
+        if shop:
+            shop[0].buy(self, num)
 
     def set_pos(self, x, y):
         self.rect.x = x

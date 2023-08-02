@@ -2,7 +2,7 @@ import time
 
 import pygame.image
 
-from src.config import TILE_SIZE
+from src.config import TILE_SIZE, SOUND_DOOR
 from src.level.level_config import FloorsTypes, DoorsCoords, RoomObjects
 from src.level.room import Room, loadImage
 from src.objects.door import Door
@@ -74,6 +74,8 @@ class Level:
             self.current_room_coords[1] += dy
             self.current_room = self.rooms[self.current_room_coords[0]][self.current_room_coords[1]]
             self.current_room.player.collideObjects = self.current_room.objects
+
+            pygame.mixer.Sound(SOUND_DOOR).play()
 
             player.rect.centerx, player.rect.centery = px, py
 

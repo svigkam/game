@@ -7,8 +7,8 @@ from src.entites.entity import Entity
 
 
 class Enemy(Entity):
-    def __init__(self, x, y, speed, hp, power, walk, idle, death, injury, attack, scale, player, radius):
-        super().__init__(x, y, speed, hp, power, walk, idle, death, injury, attack, scale)
+    def __init__(self, x, y, speed, hp, power, walk, idle, death, injury, attack, scale, player, radius, smove, sdie, sinj, sattack):
+        super().__init__(x, y, speed, hp, power, walk, idle, death, injury, attack, scale, smove, sdie, sinj, sattack)
         self.player = player
         self.radius = radius
         self.attack_radius = pygame.Rect(0, 0, 0, 0)

@@ -1,4 +1,5 @@
 from src.config import TILE_SIZE
+from src.entites.boss import Boss
 from src.level.level import Level
 from src.level.level_config import LevelsRooms, FloorsTypes, HelpPath
 from src.level.room import Room
@@ -8,6 +9,7 @@ import csv
 from src.objects.coin import Coin
 from src.objects.help_object import HelpObject
 from src.objects.label import Label
+from src.objects.shop import Shop
 
 
 def csv_to_map(path) -> []:
@@ -29,8 +31,9 @@ def add_help_signs(room):
     room.append(HelpObject(15 * TILE_SIZE, 3 * TILE_SIZE, anim=HelpPath.ATTACK.value))
     room.append(HelpObject(15 * TILE_SIZE, 2 * TILE_SIZE, path=HelpPath.SPACE.value))
 
-def add_level_label(room ,num):
-    room.append(Label( f"УРОВЕНЬ {num}", 180, 450, 140))
+
+def add_level_label(room, num):
+    room.append(Label(f"УРОВЕНЬ {num}", 180, 450, 140))
 
 
 def initLevels(disp, player):
@@ -50,6 +53,7 @@ def initLevels(disp, player):
 
     add_help_signs(level1.rooms[1][0].objects)
     add_level_label(level1.rooms[1][0].objects, 1)
+    # level1.rooms[1][0].objects.append(Shop())
 
     level2 = Level([
         [Room(disp, csv_to_map(LevelsRooms.L2R4), l2type, player),
@@ -61,6 +65,7 @@ def initLevels(disp, player):
     ], [1, 2], l2type)
 
     add_level_label(level2.rooms[1][2].objects, 2)
+    level2.rooms[1][2].objects.append(Shop())
 
     level3 = Level([
         [Room(disp, csv_to_map(LevelsRooms.L3R3), l3type, player), 0, 0],
@@ -71,6 +76,7 @@ def initLevels(disp, player):
     ], [2, 0], l3type)
 
     add_level_label(level3.rooms[2][0].objects, 3)
+    level3.rooms[2][0].objects.append(Shop())
 
     level4 = Level([
         [Room(disp, csv_to_map(LevelsRooms.L4R2), l4type, player),
@@ -81,6 +87,7 @@ def initLevels(disp, player):
     ], [1, 0], l4type)
 
     add_level_label(level4.rooms[1][0].objects, 4)
+    level4.rooms[1][0].objects.append(Shop())
 
     level5 = Level([
         [0, 0, Room(disp, csv_to_map(LevelsRooms.L5R2), l5type, player)],
@@ -91,5 +98,7 @@ def initLevels(disp, player):
     ], [1, 2], l5type)
 
     add_level_label(level5.rooms[1][2].objects, 5)
+    level5.rooms[1][2].objects.append(Shop())
+    level5.rooms[2][1].objects.append(Shop())
 
     return [level1, level2, level3, level4, level5]

@@ -13,6 +13,7 @@ class UserInterface:
 
     def update(self, display):
         result = []
+
         if self.player.hp - 2 >= 0:
             result.append(self.full_heart)
         elif self.player.hp - 1 >= 0:

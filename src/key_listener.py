@@ -16,3 +16,9 @@ def key_listener(keys, player):
 
     if move_x != 0 or move_y != 0:
         player.move(move_x, move_y)
+
+    if keys[pygame.K_1]:
+        player.buyAtShop(1)
+    if keys[pygame.K_2]:
+        player.buyAtShop(2)
+

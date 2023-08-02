@@ -54,6 +54,8 @@ class FloorsTypes(Enum):
 
 
 class HelpPath(Enum):
+    ONE = "assets/sprites/ui/1-Key.png"
+    TWO = "assets/sprites/ui/2-Key.png"
     A = "assets/sprites/ui/A-Key.png"
     W = "assets/sprites/ui/W-Key.png"
     S = "assets/sprites/ui/S-Key.png"
